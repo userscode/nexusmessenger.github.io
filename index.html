@@ -1,1272 +1,1146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Messenger</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>GitHub Messenger</title>
     <style>
+        :root {
+            --bg-color: #0d1117;
+            --header-bg: #161b22;
+            --sidebar-bg: #161b22;
+            --chat-bg: #0d1117;
+            --message-bg: #21262d;
+            --user-message-bg: #238636;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+            --accent-color: #58a6ff;
+            --input-bg: #010409;
+            --button-bg: #21262d;
+            --hover-color: #1f6feb;
+            --error-color: #f85149;
+            --success-color: #3fb950;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #6c5ce7;
-            --primary-light: #a29bfe;
-            --secondary: #fd79a8;
-            --dark: #1e1e2e;
-            --darker: #151521;
-            --light: #f8f9fa;
-            --gray: #636e72;
-            --success: #00b894;
-            --danger: #d63031;
-            --warning: #fdcb6e;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             height: 100vh;
-            overflow: hidden;
-            color: var(--light);
-        }
-
-        .messenger-container {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            background: rgba(30, 30, 46, 0.85);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 380px;
-            background: var(--darker);
             display: flex;
             flex-direction: column;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 10;
         }
 
-        .logo-container {
-            padding: 25px;
-            background: rgba(108, 92, 231, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .header {
+            background-color: var(--header-bg);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            color: white;
-        }
-
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
+            gap: 12px;
+            font-weight: 600;
             font-size: 20px;
         }
 
-        .logo-text h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-color);
         }
 
-        .logo-text p {
-            font-size: 13px;
-            color: var(--primary-light);
-            opacity: 0.8;
-        }
-
-        .connection-panel {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .panel-header {
+        .user-info {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 12px;
         }
 
-        .panel-header i {
-            font-size: 18px;
-            color: var(--primary);
-            margin-right: 10px;
-        }
-
-        .panel-header h2 {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-            position: relative;
-        }
-
-        .input-group label {
-            display: block;
-            color: #aaa;
-            font-size: 14px;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(40, 40, 60, 0.8);
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(50, 50, 70, 0.9);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
-        }
-
-        .btn-connect {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-connect:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(108, 92, 231, 0.4);
-        }
-
-        .btn-connect:active {
-            transform: translateY(0);
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            margin-top: 20px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            background: rgba(40, 40, 60, 0.6);
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 12px;
-            position: relative;
-        }
-
-        .status-dot.connected {
-            background: var(--success);
-            box-shadow: 0 0 10px var(--success);
-        }
-
-        .status-dot.connected::after {
-            content: '';
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
-            border-radius: 50%;
-            background: var(--success);
-            opacity: 0.4;
-            animation: pulse 2s infinite;
-        }
-
-        .status-dot.disconnected {
-            background: var(--danger);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.4; }
-            50% { transform: scale(1.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 0.4; }
-        }
-
-        .status-text {
-            color: #aaa;
+            font-weight: 600;
             font-size: 14px;
-            font-weight: 500;
         }
 
-        .connection-help {
-            background: rgba(40, 40, 60, 0.6);
-            border-radius: 12px;
-            margin-top: 20px;
+        .container {
+            display: flex;
+            flex: 1;
             overflow: hidden;
         }
 
-        .connection-help summary {
-            padding: 15px;
-            color: var(--primary-light);
-            font-weight: 600;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .connection-help summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .connection-help summary::after {
-            content: '▶';
-            font-size: 12px;
-            transition: transform 0.3s;
-        }
-
-        .connection-help[open] summary::after {
-            transform: rotate(90deg);
-        }
-
-        .help-content {
-            padding: 0 20px 20px;
-        }
-
-        .help-section {
-            margin-bottom: 15px;
-        }
-
-        .help-section h4 {
-            color: white;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .help-section ul {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-
-        .help-section li {
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .help-ip {
-            background: rgba(108, 92, 231, 0.2);
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--primary-light);
-        }
-
-        .users-container {
-            flex-grow: 1;
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            gap: 20px;
         }
 
-        .users-header {
-            padding: 20px 25px;
+        .connection-panel {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .panel-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #8b949e;
+        }
+
+        .text-input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .button {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .button:hover {
+            background-color: var(--hover-color);
+            border-color: var(--hover-color);
+        }
+
+        .button-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #4a95e5;
+            border-color: #4a95e5;
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .button:disabled:hover {
+            background-color: var(--button-bg);
+            border-color: var(--border-color);
+        }
+
+        .channels-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 12px;
         }
 
-        .users-header h3 {
-            color: white;
-            font-size: 16px;
+        .channels-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .new-channel-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .new-channel-btn:hover {
+            background-color: rgba(88, 166, 255, 0.1);
+        }
+
+        .channels-list {
+            list-style: none;
+        }
+
+        .channel-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .channel-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .channel-item.active {
+            background-color: rgba(88, 166, 255, 0.1);
+            color: var(--accent-color);
+        }
+
+        .channel-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-title {
             font-weight: 600;
         }
 
-        .user-count {
-            background: var(--primary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .users-list {
-            flex-grow: 1;
+        .chat-messages {
+            flex: 1;
+            padding: 20px 24px;
             overflow-y: auto;
-            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 6px;
+            background-color: var(--message-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .message.user-message {
+            align-self: flex-end;
+            background-color: var(--user-message-bg);
+            border-color: #2ea043;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+        }
+
+        .message-time {
+            color: #8b949e;
+            font-size: 12px;
+        }
+
+        .message-content {
+            line-height: 1.4;
+        }
+
+        .chat-input-container {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: var(--text-color);
+            resize: none;
+            min-height: 80px;
+            font-size: 14px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .chat-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #238636;
+        }
+
+        .status-indicator.offline {
+            background-color: #da3633;
+        }
+
+        .status-indicator.connecting {
+            background-color: #d29922;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Анимация для новых сообщений */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.new {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            gap: 24px;
+        }
+
+        .login-box {
+            background-color: var(--header-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            width: 340px;
+        }
+
+        .login-title {
+            font-weight: 600;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-tab {
+            flex: 1;
+            padding: 8px 0;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .form-tab.active {
+            border-bottom-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-list {
+            margin-top: 20px;
+        }
+
+        .user-list-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
         }
 
         .user-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            background: rgba(40, 40, 60, 0.6);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .user-item:hover {
-            background: rgba(50, 50, 70, 0.8);
-            border-color: rgba(108, 92, 231, 0.3);
-        }
-
-        .user-item.active {
-            background: rgba(108, 92, 231, 0.15);
-            border-color: var(--primary);
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 14px;
         }
 
         .user-avatar {
-            width: 44px;
-            height: 44px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-color: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 15px;
-            font-size: 16px;
-            position: relative;
-        }
-
-        .user-status-indicator {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid var(--darker);
-        }
-
-        .user-status-indicator.online {
-            background: var(--success);
-        }
-
-        .user-status-indicator.offline {
-            background: var(--gray);
-        }
-
-        .user-info {
-            flex-grow: 1;
-        }
-
-        .user-name {
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .user-you {
-            background: var(--primary);
-            color: white;
-            padding: 1px 6px;
-            border-radius: 10px;
             font-size: 10px;
             font-weight: 600;
         }
 
-        .user-status {
-            color: #aaa;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Chat Area Styles */
-        .chat-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--dark);
-            position: relative;
-        }
-
-        .chat-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(30, 30, 46, 0.9);
-        }
-
-        .chat-info h2 {
-            color: white;
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
-
-        .chat-info p {
-            color: #aaa;
+        .alert {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
             font-size: 14px;
         }
 
-        .chat-stats {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: #aaa;
-            font-size: 14px;
+        .alert-error {
+            background-color: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
         }
 
-        .online-count, .offline-count {
+        .alert-success {
+            background-color: rgba(63, 185, 80, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .server-status {
             display: flex;
             align-items: center;
             gap: 6px;
+            font-size: 12px;
+            margin-bottom: 8px;
         }
 
-        .online-count i {
-            color: var(--success);
-        }
-
-        .offline-count i {
-            color: var(--gray);
-        }
-
-        .messages-container {
-            flex-grow: 1;
-            padding: 25px 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.03"><rect fill="white" width="100" height="100"/></svg>');
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 16px 20px;
-            border-radius: 18px;
-            margin-bottom: 18px;
-            position: relative;
-            animation: messageAppear 0.3s ease-out;
-        }
-
-        @keyframes messageAppear {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .received {
-            align-self: flex-start;
-            background: rgba(60, 60, 80, 0.8);
-            color: white;
-            border-bottom-left-radius: 5px;
-        }
-
-        .sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .message-you {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 1px 6px;
-            border-radius: 8px;
-            font-size: 10px;
-        }
-
-        .message-text {
-            font-size: 15px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .message-time {
-            font-size: 11px;
-            text-align: right;
-            margin-top: 8px;
-            opacity: 0.7;
-        }
-
-        .system-message {
-            align-self: center;
-            background: rgba(255, 255, 255, 0.1);
-            color: #aaa;
-            font-style: italic;
-            max-width: 80%;
-            text-align: center;
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-
-        .typing-indicator {
-            align-self: flex-start;
-            background: rgba(60, 60, 80, 0.8);
-            color: #aaa;
-            padding: 12px 18px;
-            border-radius: 18px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .typing-dots {
-            display: inline-flex;
-            gap: 3px;
-            margin-left: 5px;
-        }
-
-        .typing-dots span {
+        .server-status-indicator {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #aaa;
-            animation: typing 1.4s infinite ease-in-out;
         }
 
-        .typing-dots span:nth-child(1) { animation-delay: 0s; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
+        .server-status-online {
+            background-color: var(--success-color);
         }
 
-        .input-area {
-            padding: 20px 30px;
-            display: flex;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(30, 30, 46, 0.9);
-        }
-
-        .message-input {
-            flex-grow: 1;
-            padding: 16px 20px;
-            border-radius: 25px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(40, 40, 60, 0.8);
-            color: white;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            resize: none;
-            height: 52px;
-            max-height: 120px;
-        }
-
-        .message-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(50, 50, 70, 0.9);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
-        }
-
-        .btn-send {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            margin-left: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .btn-send:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-        }
-
-        .btn-send:active {
-            transform: scale(0.98);
-        }
-
-        .btn-send:disabled {
-            background: var(--gray);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Connection Error */
-        .connection-error {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--danger);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            max-width: 400px;
-        }
-
-        .connection-error.show {
-            transform: translateX(0);
-        }
-
-        .connection-error i {
-            font-size: 20px;
-        }
-
-        .error-content {
-            flex-grow: 1;
-        }
-
-        .error-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .error-message {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .error-close {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .error-close:hover {
-            opacity: 1;
-        }
-
-        /* Scrollbar Styles */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(108, 92, 231, 0.5);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(108, 92, 231, 0.7);
-        }
-
-        /* Responsive */
-        @media (max-width: 1100px) {
-            .sidebar {
-                width: 340px;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .messenger-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: 40%;
-            }
-            
-            .chat-area {
-                height: 60%;
-            }
-        }
-
-        /* Welcome State */
-        .welcome-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .welcome-icon {
-            font-size: 80px;
-            color: var(--primary-light);
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-
-        .welcome-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: white;
-        }
-
-        .welcome-text {
-            font-size: 16px;
-            color: #aaa;
-            max-width: 500px;
-            line-height: 1.6;
+        .server-status-offline {
+            background-color: var(--error-color);
         }
     </style>
 </head>
 <body>
-    <div class="connection-error" id="connection-error">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div class="error-content">
-            <div class="error-title">Connection Error</div>
-            <div class="error-message" id="error-message">Failed to connect to server</div>
+    <div class="login-container" id="loginContainer">
+        <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+            <span>GitHub Messenger</span>
         </div>
-        <button class="error-close" id="error-close">
-            <i class="fas fa-times"></i>
-        </button>
+        <div class="login-box">
+            <div class="login-title">Вход в аккаунт</div>
+            
+            <div class="form-tabs">
+                <div class="form-tab active" id="loginTab">Вход</div>
+                <div class="form-tab" id="registerTab">Регистрация</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="input-label">Адрес сервера</label>
+                <input type="text" class="text-input" id="serverAddress" placeholder="ws://localhost:8080" value="ws://localhost:8080">
+                <div class="server-status" id="serverStatus">
+                    <div class="server-status-indicator server-status-offline"></div>
+                    <span>Статус сервера: Проверка...</span>
+                </div>
+            </div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label class="input-label">Имя пользователя</label>
+                    <input type="text" class="text-input" id="loginUsername" placeholder="Введите имя пользователя">
+                </div>
+                <div class="form-group">
+                    <label class="input-label">Пароль</label>
+                    <input type="password" class="text-input" id="loginPassword" placeholder="Введите пароль">
+                </div>
+                <button class="button button-primary" id="loginButton" style="width: 100%;" disabled>Вход</button>
+            </div>
+            
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label class="input-label">Имя пользователя</label>
+                    <input type="text" class="text-input" id="registerUsername" placeholder="Введите имя пользователя">
+                </div>
+                <div class="form-group">
+                    <label class="input-label">Пароль</label>
+                    <input type="password" class="text-input" id="registerPassword" placeholder="Введите пароль">
+                </div>
+                <div class="form-group">
+                    <label class="input-label">Подтверждение пароля</label>
+                    <input type="password" class="text-input" id="registerConfirmPassword" placeholder="Повторите пароль">
+                </div>
+                <button class="button button-primary" id="registerButton" style="width: 100%;" disabled>Регистрация</button>
+            </div>
+            
+            <div id="loginAlert"></div>
+        </div>
     </div>
 
-    <div class="messenger-container">
-        <!-- Sidebar with connection controls and user list -->
-        <div class="sidebar">
-            <div class="logo-container">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="logo-text">
-                        <h1>Nexus Messenger</h1>
-                        <p>Real-time communication</p>
-                    </div>
-                </div>
+    <div class="hidden" id="appContainer">
+        <div class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+                <span>GitHub Messenger</span>
             </div>
-            
-            <div class="connection-panel">
-                <div class="panel-header">
-                    <i class="fas fa-server"></i>
-                    <h2>Server Connection</h2>
+            <div class="user-info">
+                <div class="connection-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">Подключение...</span>
                 </div>
-                
-                <div class="input-group">
-                    <label for="server-ip">Server IP Address</label>
-                    <input type="text" id="server-ip" value="localhost" placeholder="Enter server IP">
-                </div>
-                
-                <div class="input-group">
-                    <label for="server-port">Port</label>
-                    <input type="text" id="server-port" value="8765" placeholder="Enter port">
-                </div>
-                
-                <div class="input-group">
-                    <label for="username">Your Username</label>
-                    <input type="text" id="username" placeholder="Enter your username">
-                </div>
-                
-                <button class="btn-connect" id="connect-btn">
-                    <i class="fas fa-plug"></i> Connect to Server
-                </button>
-                
-                <div class="status-indicator">
-                    <div class="status-dot disconnected"></div>
-                    <div class="status-text" id="status-text">Disconnected from server</div>
-                </div>
-
-                <details class="connection-help">
-                    <summary>
-                        <i class="fas fa-info-circle"></i>
-                        Connection Help
-                    </summary>
-                    <div class="help-content">
-                        <div class="help-section">
-                            <h4><i class="fas fa-desktop"></i> Same Computer</h4>
-                            <ul>
-                                <li>Server IP: <span class="help-ip">localhost</span></li>
-                                <li>Port: <span class="help-ip">8765</span></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="help-section">
-                            <h4><i class="fas fa-wifi"></i> Same Network</h4>
-                            <ul>
-                                <li>Find your computer's IP address</li>
-                                <li>Server IP: <span class="help-ip">[computer-ip]</span></li>
-                                <li>Port: <span class="help-ip">8765</span></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="help-section">
-                            <h4><i class="fas fa-globe"></i> Different Network</h4>
-                            <ul>
-                                <li>Configure port forwarding on router</li>
-                                <li>Use your public IP address</li>
-                                <li>Port: <span class="help-ip">8765</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </details>
-            </div>
-            
-            <div class="users-container">
-                <div class="users-header">
-                    <h3>Active Users</h3>
-                    <div class="user-count" id="user-count">0/0</div>
-                </div>
-                <div class="users-list" id="users-container">
-                    <!-- Users will be populated by JavaScript -->
-                </div>
+                <div class="avatar" id="userAvatar"></div>
+                <span id="username">user</span>
+                <button class="button" id="logoutButton">Выйти</button>
             </div>
         </div>
-        
-        <!-- Main chat area -->
-        <div class="chat-area">
-            <div class="chat-header">
-                <div class="chat-info">
-                    <h2>General Chat</h2>
-                    <p>Team communication channel</p>
+
+        <div class="container">
+            <div class="sidebar">
+                <div class="connection-panel">
+                    <div class="panel-title">Подключение</div>
+                    <div class="input-group">
+                        <label class="input-label">Адрес сервера</label>
+                        <input type="text" class="text-input" id="serverAddressInput" value="ws://localhost:8080">
+                    </div>
+                    <button class="button button-primary" id="connectButton" style="width: 100%;">Подключиться</button>
+                    <button class="button" id="disconnectButton" style="width: 100%; margin-top: 8px;">Отключиться</button>
                 </div>
-                
-                <div class="chat-stats">
-                    <div class="online-count">
-                        <i class="fas fa-circle"></i>
-                        <span id="online-count">0 Online</span>
+
+                <div class="channels-panel">
+                    <div class="channels-header">
+                        <div class="channels-title">Каналы</div>
+                        <button class="new-channel-btn">+ Новый</button>
                     </div>
-                    <div class="offline-count">
-                        <i class="fas fa-circle"></i>
-                        <span id="offline-count">0 Offline</span>
-                    </div>
+                    <ul class="channels-list" id="channelsList">
+                        <li class="channel-item active" data-channel="general">
+                            <svg class="channel-icon" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M1.5 3.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2.5l-3 3-3-3H3.5a2 2 0 0 1-2-2v-9z"/>
+                            </svg>
+                            <span>general</span>
+                        </li>
+                        <li class="channel-item" data-channel="random">
+                            <svg class="channel-icon" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M1.5 3.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2.5l-3 3-3-3H3.5a2 2 0 0 1-2-2v-9z"/>
+                            </svg>
+                            <span>random</span>
+                        </li>
+                        <li class="channel-item" data-channel="help">
+                            <svg class="channel-icon" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M1.5 3.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2.5l-3 3-3-3H3.5a2 2 0 0 1-2-2v-9z"/>
+                            </svg>
+                            <span>help</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="user-list">
+                    <div class="user-list-title">Пользователи онлайн</div>
+                    <div id="onlineUsers"></div>
                 </div>
             </div>
-            
-            <div class="messages-container" id="messages-container">
-                <div class="welcome-state" id="welcome-state">
-                    <div class="welcome-icon">
-                        <i class="fas fa-comment-dots"></i>
-                    </div>
-                    <div class="welcome-title">Welcome to Nexus Messenger</div>
-                    <div class="welcome-text">
-                        Connect to the server to start chatting with your team in real-time. 
-                        Secure, fast, and easy to use.
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M1.5 3.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2.5l-3 3-3-3H3.5a2 2 0 0 1-2-2v-9z"/>
+                    </svg>
+                    <span class="chat-title" id="currentChannel">general</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <div class="message-header">
+                            <span class="message-sender">system</span>
+                            <span class="message-time" id="currentTime"></span>
+                        </div>
+                        <div class="message-content">
+                            Добро пожаловать в GitHub Messenger! Начните общение в реальном времени.
+                        </div>
                     </div>
                 </div>
-                <!-- Messages will be added here dynamically -->
-            </div>
-            
-            <div class="typing-indicator" id="typing-indicator">
-                <span id="typing-user">Someone</span> is typing
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div class="chat-input-container">
+                    <textarea class="chat-input" id="messageInput" placeholder="Напишите сообщение..." disabled></textarea>
+                    <div class="chat-actions">
+                        <button class="button button-primary" id="sendButton" disabled>Отправить</button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="input-area">
-                <textarea class="message-input" id="message-input" placeholder="Type your message here..." disabled rows="1"></textarea>
-                <button class="btn-send" id="send-btn" disabled>
-                    <i class="fas fa-paper-plane"></i>
-                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // WebSocket and application state
-        let socket = null;
-        let currentUser = null;
-        let users = {};
-        let typingTimer = null;
-
-        // DOM elements
-        const connectBtn = document.getElementById('connect-btn');
-        const statusDot = document.querySelector('.status-dot');
-        const statusText = document.getElementById('status-text');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const messagesContainer = document.getElementById('messages-container');
-        const usersContainer = document.getElementById('users-container');
-        const userCount = document.getElementById('user-count');
-        const onlineCount = document.getElementById('online-count');
-        const offlineCount = document.getElementById('offline-count');
-        const connectionError = document.getElementById('connection-error');
-        const errorMessage = document.getElementById('error-message');
-        const errorClose = document.getElementById('error-close');
-        const welcomeState = document.getElementById('welcome-state');
-        const typingIndicator = document.getElementById('typing-indicator');
-        const typingUser = document.getElementById('typing-user');
-
-        // Connection button functionality
-        connectBtn.addEventListener('click', function() {
-            if (statusDot.classList.contains('disconnected')) {
-                connectToServer();
-            } else {
-                disconnectFromServer();
-            }
-        });
-
-        // Send message functionality
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        // Auto-resize textarea
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const loginContainer = document.getElementById('loginContainer');
+            const appContainer = document.getElementById('appContainer');
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+            const logoutButton = document.getElementById('logoutButton');
+            const connectButton = document.getElementById('connectButton');
+            const disconnectButton = document.getElementById('disconnectButton');
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            const registerUsername = document.getElementById('registerUsername');
+            const registerPassword = document.getElementById('registerPassword');
+            const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+            const serverAddress = document.getElementById('serverAddress');
+            const serverAddressInput = document.getElementById('serverAddressInput');
+            const serverStatus = document.getElementById('serverStatus');
+            const chatMessages = document.getElementById('chatMessages');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const channelsList = document.getElementById('channelsList');
+            const currentChannel = document.getElementById('currentChannel');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const username = document.getElementById('username');
+            const userAvatar = document.getElementById('userAvatar');
+            const onlineUsers = document.getElementById('onlineUsers');
+            const currentTime = document.getElementById('currentTime');
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginAlert = document.getElementById('loginAlert');
             
-            // Send typing indicator
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                clearTimeout(typingTimer);
-                // In a real app, you would send a "typing" message to the server
-                typingTimer = setTimeout(() => {
-                    // Typing stopped
-                }, 1000);
-            }
-        });
-
-        // Close error message
-        errorClose.addEventListener('click', function() {
-            connectionError.classList.remove('show');
-        });
-
-        function connectToServer() {
-            const serverIp = document.getElementById('server-ip').value.trim();
-            const serverPort = document.getElementById('server-port').value.trim();
-            const username = document.getElementById('username').value.trim();
-            
-            if (!username) {
-                showError('Please enter a username');
-                return;
-            }
-            
-            if (!serverIp) {
-                showError('Please enter a server IP address');
-                return;
-            }
-            
-            if (!serverPort) {
-                showError('Please enter a server port');
-                return;
-            }
-            
-            currentUser = username;
-            
-            try {
-                // Create WebSocket connection
-                socket = new WebSocket(`ws://${serverIp}:${serverPort}`);
-                
-                // Connection opened
-                socket.addEventListener('open', function(event) {
-                    updateConnectionStatus(true);
-                    
-                    // Send connection message to server
-                    const connectMsg = {
-                        type: 'connect',
-                        username: username
-                    };
-                    socket.send(JSON.stringify(connectMsg));
-                    
-                    // Enable message input
-                    messageInput.disabled = false;
-                    sendBtn.disabled = false;
-                    messageInput.focus();
-                    
-                    // Hide welcome state
-                    welcomeState.style.display = 'none';
-                    
-                    addSystemMessage('Connected to server successfully!');
-                });
-                
-                // Listen for messages
-                socket.addEventListener('message', function(event) {
-                    const data = JSON.parse(event.data);
-                    handleServerMessage(data);
-                });
-                
-                // Connection closed
-                socket.addEventListener('close', function(event) {
-                    updateConnectionStatus(false);
-                    addSystemMessage('Disconnected from server');
-                    
-                    // Disable message input
-                    messageInput.disabled = true;
-                    sendBtn.disabled = true;
-                    
-                    // Show welcome state if no messages
-                    if (messagesContainer.children.length <= 1) {
-                        welcomeState.style.display = 'flex';
-                    }
-                });
-                
-                // Handle errors
-                socket.addEventListener('error', function(event) {
-                    updateConnectionStatus(false);
-                    showError('Failed to connect to server. Check the server IP and port.');
-                    
-                    // Disable message input
-                    messageInput.disabled = true;
-                    sendBtn.disabled = true;
-                });
-                
-            } catch (error) {
-                showError('Error creating connection: ' + error.message);
-            }
-        }
-
-        function disconnectFromServer() {
-            if (socket) {
-                // Send disconnect message to server
-                const disconnectMsg = {
-                    type: 'disconnect',
-                    username: currentUser
-                };
-                socket.send(JSON.stringify(disconnectMsg));
-                
-                // Close the connection
-                socket.close();
-                socket = null;
-                
-                updateConnectionStatus(false);
-                addSystemMessage('Disconnected from server');
-                
-                // Disable message input
-                messageInput.disabled = true;
-                sendBtn.disabled = true;
-                
-                // Clear users list
-                users = {};
-                updateUsersList();
-                
-                // Show welcome state if no messages
-                if (messagesContainer.children.length <= 1) {
-                    welcomeState.style.display = 'flex';
-                }
-            }
-        }
-
-        function handleServerMessage(data) {
-            switch(data.type) {
-                case 'user_list':
-                    users = data.users;
-                    updateUsersList();
-                    break;
-                    
-                case 'user_joined':
-                    users = data.users;
-                    updateUsersList();
-                    addSystemMessage(`${data.username} joined the chat`);
-                    break;
-                    
-                case 'user_left':
-                    users = data.users;
-                    updateUsersList();
-                    addSystemMessage(`${data.username} left the chat`);
-                    break;
-                    
-                case 'new_message':
-                    addMessage(data.username, data.text, data.username === currentUser ? 'sent' : 'received');
-                    break;
-                    
-                case 'system_message':
-                    addSystemMessage(data.text);
-                    break;
-                    
-                case 'error':
-                    showError(data.message);
-                    break;
-                    
-                case 'typing':
-                    // Handle typing indicator
-                    if (data.username !== currentUser) {
-                        typingUser.textContent = data.username;
-                        typingIndicator.style.display = 'block';
-                        
-                        // Hide after 3 seconds
-                        setTimeout(() => {
-                            typingIndicator.style.display = 'none';
-                        }, 3000);
-                    }
-                    break;
-            }
-        }
-
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message !== '' && socket && socket.readyState === WebSocket.OPEN) {
-                const messageData = {
-                    type: 'message',
-                    username: currentUser,
-                    text: message
-                };
-                socket.send(JSON.stringify(messageData));
-                
-                // Clear input and reset height
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-                
-                // Add message to UI immediately for better UX
-                addMessage(currentUser, message, 'sent');
-            }
-        }
-
-        function updateConnectionStatus(connected) {
-            if (connected) {
-                statusDot.classList.remove('disconnected');
-                statusDot.classList.add('connected');
-                statusText.textContent = 'Connected to server';
-                connectBtn.innerHTML = '<i class="fas fa-plug"></i> Disconnect';
-                connectionError.classList.remove('show');
-            } else {
-                statusDot.classList.remove('connected');
-                statusDot.classList.add('disconnected');
-                statusText.textContent = 'Disconnected from server';
-                connectBtn.innerHTML = '<i class="fas fa-plug"></i> Connect to Server';
-            }
-        }
-
-        function addMessage(sender, text, type) {
-            // Ensure welcome state is hidden
-            welcomeState.style.display = 'none';
-            
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', type);
-            
+            // Обновляем время в приветственном сообщении
             const now = new Date();
-            const timeString = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+            currentTime.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             
-            const youBadge = sender === currentUser ? '<span class="message-you">You</span>' : '';
+            let currentUser = '';
+            let currentChannelName = 'general';
+            let socket = null;
+            let serverCheckInterval = null;
+            let isManualDisconnect = false;
             
-            messageElement.innerHTML = `
-                <div class="message-sender">${sender} ${youBadge}</div>
-                <div class="message-text">${text}</div>
-                <div class="message-time">${timeString}</div>
-            `;
+            // Функция для проверки статуса сервера
+            async function checkServerStatus(serverUrl) {
+                try {
+                    // Пробуем подключиться к серверу
+                    const testSocket = new WebSocket(serverUrl);
+                    
+                    return new Promise((resolve) => {
+                        testSocket.onopen = () => {
+                            testSocket.close();
+                            resolve(true);
+                        };
+                        
+                        testSocket.onerror = () => {
+                            resolve(false);
+                        };
+                        
+                        // Таймаут на проверку
+                        setTimeout(() => {
+                            testSocket.close();
+                            resolve(false);
+                        }, 3000);
+                    });
+                } catch (error) {
+                    return false;
+                }
+            }
             
-            messagesContainer.appendChild(messageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function addSystemMessage(text) {
-            // Ensure welcome state is hidden
-            welcomeState.style.display = 'none';
-            
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('system-message');
-            messageElement.textContent = text;
-            
-            messagesContainer.appendChild(messageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function updateUsersList() {
-            // Clear current users list
-            usersContainer.innerHTML = '';
-            
-            let online = 0;
-            let offline = 0;
-            
-            // Add each user to the list
-            for (const [username, userData] of Object.entries(users)) {
-                const userItem = document.createElement('div');
-                userItem.classList.add('user-item');
-                if (username === currentUser) {
-                    userItem.classList.add('active');
+            // Функция для обновления статуса сервера
+            async function updateServerStatus() {
+                const serverUrl = serverAddress.value.trim();
+                if (!serverUrl) {
+                    serverStatus.innerHTML = '<div class="server-status-indicator server-status-offline"></div><span>Статус сервера: Введите адрес</span>';
+                    return false;
                 }
                 
-                const status = userData.status || 'offline';
-                const lastSeen = userData.last_seen ? new Date(userData.last_seen).toLocaleDateString() : '';
+                const isOnline = await checkServerStatus(serverUrl);
                 
-                if (status === 'online') online++;
-                else offline++;
+                if (isOnline) {
+                    serverStatus.innerHTML = '<div class="server-status-indicator server-status-online"></div><span>Статус сервера: Онлайн</span>';
+                    loginButton.disabled = false;
+                    registerButton.disabled = false;
+                } else {
+                    serverStatus.innerHTML = '<div class="server-status-indicator server-status-offline"></div><span>Статус сервера: Офлайн</span>';
+                    loginButton.disabled = true;
+                    registerButton.disabled = true;
+                }
                 
-                const youBadge = username === currentUser ? '<span class="user-you">You</span>' : '';
-                const statusClass = status === 'online' ? 'online' : 'offline';
-                const statusText = status === 'online' ? 'Online' : `Last seen ${lastSeen}`;
+                return isOnline;
+            }
+            
+            // Функция для генерации аватара
+            function generateAvatar(name) {
+                return name.substring(0, 2).toUpperCase();
+            }
+            
+            // Функция для форматирования времени
+            function formatTime(timestamp) {
+                const time = new Date(timestamp);
+                return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
+            }
+            
+            // Функция для обновления статуса подключения
+            function updateConnectionStatus(status, text) {
+                statusIndicator.className = 'status-indicator';
+                if (status === 'connected') {
+                    statusIndicator.classList.add('connected');
+                    statusText.textContent = text || 'Подключено';
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                } else if (status === 'connecting') {
+                    statusIndicator.classList.add('connecting');
+                    statusText.textContent = text || 'Подключение...';
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                } else {
+                    statusIndicator.classList.add('offline');
+                    statusText.textContent = text || 'Отключено';
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                }
+            }
+            
+            // Функция для показа уведомления
+            function showAlert(message, type) {
+                loginAlert.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            }
+            
+            // Функция для очистки уведомления
+            function clearAlert() {
+                loginAlert.innerHTML = '';
+            }
+            
+            // Функция для возврата в меню подключения
+            function returnToLogin(message) {
+                if (socket) {
+                    socket.close();
+                    socket = null;
+                }
                 
-                userItem.innerHTML = `
-                    <div class="user-avatar">
-                        ${username.substring(0, 2).toUpperCase()}
-                        <div class="user-status-indicator ${statusClass}"></div>
-                    </div>
-                    <div class="user-info">
-                        <div class="user-name">${username} ${youBadge}</div>
-                        <div class="user-status">${statusText}</div>
+                appContainer.classList.add('hidden');
+                loginContainer.classList.remove('hidden');
+                
+                if (message) {
+                    showAlert(message, 'error');
+                }
+                
+                // Очищаем поля ввода
+                loginUsername.value = '';
+                loginPassword.value = '';
+                registerUsername.value = '';
+                registerPassword.value = '';
+                registerConfirmPassword.value = '';
+                
+                // Сбрасываем состояние чата
+                chatMessages.innerHTML = `
+                    <div class="message">
+                        <div class="message-header">
+                            <span class="message-sender">system</span>
+                            <span class="message-time">${formatTime(new Date())}</span>
+                        </div>
+                        <div class="message-content">
+                            Добро пожаловать в GitHub Messenger! Начните общение в реальном времени.
+                        </div>
                     </div>
                 `;
                 
-                usersContainer.appendChild(userItem);
+                currentUser = '';
+                currentChannelName = 'general';
+                isManualDisconnect = false;
             }
             
-            // Update counters
-            userCount.textContent = `${online}/${online + offline}`;
-            onlineCount.textContent = `${online} Online`;
-            offlineCount.textContent = `${offline} Offline`;
-        }
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            connectionError.classList.add('show');
+            // Функция для добавления сообщения в чат
+            function addMessageToChat(user, message, timestamp, isCurrentUser = false) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${isCurrentUser ? 'user-message' : ''} new`;
+                
+                const timeString = formatTime(timestamp);
+                
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-sender">${user}</span>
+                        <span class="message-time">${timeString}</span>
+                    </div>
+                    <div class="message-content">${message}</div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Убираем класс анимации после завершения
+                setTimeout(() => {
+                    messageElement.classList.remove('new');
+                }, 300);
+            }
             
-            // Hide error after 8 seconds
-            setTimeout(() => {
-                connectionError.classList.remove('show');
-            }, 8000);
-        }
-
-        // Initialize the UI
-        updateUsersList();
+            // Функция для обновления списка пользователей
+            function updateOnlineUsers(users) {
+                onlineUsers.innerHTML = '';
+                users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.className = 'user-item';
+                    userElement.innerHTML = `
+                        <div class="user-avatar">${generateAvatar(user)}</div>
+                        <span>${user}</span>
+                    `;
+                    onlineUsers.appendChild(userElement);
+                });
+            }
+            
+            // Функция для подключения к серверу
+            function connectToServer(serverUrl, usernameValue, passwordValue, isRegister = false) {
+                updateConnectionStatus('connecting', 'Подключение...');
+                
+                return new Promise((resolve, reject) => {
+                    try {
+                        socket = new WebSocket(serverUrl);
+                        
+                        socket.onopen = function(event) {
+                            console.log('WebSocket подключение установлено');
+                            updateConnectionStatus('connected', 'Подключено');
+                            
+                            // Отправляем информацию о пользователе
+                            socket.send(JSON.stringify({
+                                type: isRegister ? 'register' : 'login',
+                                user: usernameValue,
+                                password: passwordValue,
+                                channel: currentChannelName
+                            }));
+                            
+                            addMessageToChat('system', 'Подключение к серверу установлено', new Date().toISOString());
+                            resolve(true);
+                        };
+                        
+                        socket.onmessage = function(event) {
+                            const data = JSON.parse(event.data);
+                            console.log('Получено сообщение от сервера:', data);
+                            
+                            if (data.type === 'auth_success') {
+                                currentUser = data.user;
+                                username.textContent = currentUser;
+                                userAvatar.textContent = generateAvatar(currentUser);
+                                
+                                loginContainer.classList.add('hidden');
+                                appContainer.classList.remove('hidden');
+                                
+                                addMessageToChat('system', `Добро пожаловать, ${currentUser}!`, new Date().toISOString());
+                                
+                            } else if (data.type === 'auth_error') {
+                                updateConnectionStatus('offline', 'Ошибка аутентификации');
+                                showAlert(data.message, 'error');
+                                reject(new Error(data.message));
+                                
+                            } else if (data.type === 'message') {
+                                // Показываем сообщение только если мы в правильном канале
+                                if (data.channel === currentChannelName) {
+                                    addMessageToChat(data.user, data.message, data.timestamp, data.user === currentUser);
+                                }
+                            } else if (data.type === 'users') {
+                                updateOnlineUsers(data.users);
+                            } else if (data.type === 'system') {
+                                addMessageToChat('system', data.message, data.timestamp);
+                            } else if (data.type === 'server_info') {
+                                console.log('Информация от сервера:', data.message);
+                            }
+                        };
+                        
+                        socket.onclose = function(event) {
+                            console.log('WebSocket соединение закрыто:', event.code, event.reason);
+                            updateConnectionStatus('offline', 'Отключено от сервера');
+                            
+                            if (!isManualDisconnect) {
+                                addMessageToChat('system', 'Соединение с сервером разорвано', new Date().toISOString());
+                                // Автоматически возвращаем в меню подключения при разрыве соединения
+                                setTimeout(() => {
+                                    returnToLogin('Соединение с сервером разорвано. Пожалуйста, подключитесь заново.');
+                                }, 1000);
+                            }
+                            
+                            reject(new Error('Соединение закрыто'));
+                        };
+                        
+                        socket.onerror = function(error) {
+                            console.error('WebSocket ошибка:', error);
+                            updateConnectionStatus('offline', 'Ошибка подключения');
+                            addMessageToChat('system', 'Ошибка подключения к серверу', new Date().toISOString());
+                            reject(new Error('Ошибка WebSocket'));
+                        };
+                        
+                    } catch (error) {
+                        console.error('Ошибка подключения:', error);
+                        updateConnectionStatus('offline', 'Ошибка подключения');
+                        addMessageToChat('system', `Ошибка: ${error.message}`, new Date().toISOString());
+                        reject(error);
+                    }
+                });
+            }
+            
+            // Функция для отправки сообщения
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message && socket && socket.readyState === WebSocket.OPEN) {
+                    const messageData = {
+                        type: 'message',
+                        channel: currentChannelName,
+                        user: currentUser,
+                        message: message,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    socket.send(JSON.stringify(messageData));
+                    messageInput.value = '';
+                }
+            }
+            
+            // Функция для смены канала
+            function switchChannel(channelName) {
+                currentChannelName = channelName;
+                currentChannel.textContent = channelName;
+                
+                // Обновляем активный канал в списке
+                document.querySelectorAll('.channel-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`.channel-item[data-channel="${channelName}"]`).classList.add('active');
+                
+                // Очищаем чат и загружаем историю сообщений для выбранного канала
+                chatMessages.innerHTML = '';
+                addMessageToChat('system', `Вы присоединились к каналу #${channelName}`, new Date().toISOString());
+                
+                // Сообщаем серверу о смене канала
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'join',
+                        user: currentUser,
+                        channel: channelName
+                    }));
+                }
+            }
+            
+            // Обработчики событий
+            loginTab.addEventListener('click', function() {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                clearAlert();
+            });
+            
+            registerTab.addEventListener('click', function() {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                clearAlert();
+            });
+            
+            loginButton.addEventListener('click', async function() {
+                const usernameValue = loginUsername.value.trim();
+                const passwordValue = loginPassword.value.trim();
+                const serverUrl = serverAddress.value.trim();
+                
+                if (!usernameValue || !passwordValue) {
+                    showAlert('Пожалуйста, заполните все поля', 'error');
+                    return;
+                }
+                
+                if (!serverUrl) {
+                    showAlert('Пожалуйста, введите адрес сервера', 'error');
+                    return;
+                }
+                
+                loginButton.disabled = true;
+                loginButton.textContent = 'Подключение...';
+                
+                try {
+                    await connectToServer(serverUrl, usernameValue, passwordValue, false);
+                    serverAddressInput.value = serverUrl;
+                } catch (error) {
+                    console.error('Connection error:', error);
+                } finally {
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Вход';
+                }
+            });
+            
+            registerButton.addEventListener('click', async function() {
+                const usernameValue = registerUsername.value.trim();
+                const passwordValue = registerPassword.value.trim();
+                const confirmPasswordValue = registerConfirmPassword.value.trim();
+                const serverUrl = serverAddress.value.trim();
+                
+                if (!usernameValue || !passwordValue || !confirmPasswordValue) {
+                    showAlert('Пожалуйста, заполните все поля', 'error');
+                    return;
+                }
+                
+                if (passwordValue !== confirmPasswordValue) {
+                    showAlert('Пароли не совпадают', 'error');
+                    return;
+                }
+                
+                if (passwordValue.length < 3) {
+                    showAlert('Пароль должен содержать минимум 3 символа', 'error');
+                    return;
+                }
+                
+                if (!serverUrl) {
+                    showAlert('Пожалуйста, введите адрес сервера', 'error');
+                    return;
+                }
+                
+                registerButton.disabled = true;
+                registerButton.textContent = 'Регистрация...';
+                
+                try {
+                    await connectToServer(serverUrl, usernameValue, passwordValue, true);
+                    serverAddressInput.value = serverUrl;
+                } catch (error) {
+                    console.error('Registration error:', error);
+                } finally {
+                    registerButton.disabled = false;
+                    registerButton.textContent = 'Регистрация';
+                }
+            });
+            
+            logoutButton.addEventListener('click', function() {
+                isManualDisconnect = true;
+                returnToLogin();
+            });
+            
+            connectButton.addEventListener('click', function() {
+                const serverUrl = serverAddressInput.value.trim();
+                
+                if (!serverUrl) {
+                    showAlert('Пожалуйста, введите адрес сервера', 'error');
+                    return;
+                }
+                
+                if (socket) {
+                    socket.close();
+                }
+                
+                // Для переподключения используем текущие учетные данные
+                connectToServer(serverUrl, currentUser, '', false).catch(error => {
+                    console.error('Reconnection error:', error);
+                });
+            });
+            
+            disconnectButton.addEventListener('click', function() {
+                isManualDisconnect = true;
+                if (socket) {
+                    socket.close();
+                    updateConnectionStatus('offline', 'Отключено вручную');
+                    addMessageToChat('system', 'Соединение с сервером разорвано', new Date().toISOString());
+                    onlineUsers.innerHTML = '';
+                    socket = null;
+                }
+            });
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            channelsList.addEventListener('click', function(event) {
+                const channelItem = event.target.closest('.channel-item');
+                if (channelItem) {
+                    const channelName = channelItem.getAttribute('data-channel');
+                    switchChannel(channelName);
+                }
+            });
+            
+            // Автоподключение при вводе адреса сервера и нажатии Enter
+            serverAddress.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    if (loginTab.classList.contains('active')) {
+                        loginButton.click();
+                    } else {
+                        registerButton.click();
+                    }
+                }
+            });
+            
+            serverAddressInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    connectButton.click();
+                }
+            });
+            
+            // Проверка статуса сервера при изменении адреса
+            serverAddress.addEventListener('input', function() {
+                clearAlert();
+                updateServerStatus();
+            });
+            
+            // Запускаем периодическую проверку статуса сервера
+            serverCheckInterval = setInterval(updateServerStatus, 10000);
+            
+            // Первоначальная проверка статуса сервера
+            updateServerStatus();
+        });
     </script>
 </body>
 </html>
