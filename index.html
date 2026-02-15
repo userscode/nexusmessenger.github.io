@@ -2,190 +2,321 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мобильный Мессенджер</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .custom-gray { background-color: #D1D5DB; }
-        .input-line {
-            border-bottom: 1.5px solid #4b5563;
-            width: 80%;
-            margin: 0 auto;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
-        .hidden { display: none; }
-        .rounded-login { border-radius: 2.5rem; }
-        .rounded-chat { border-radius: 3rem; }
-        
-        /* Стили для скроллбара */
-        #chatBox::-webkit-scrollbar {
-            width: 6px;
+
+        /* Стили из макетов */
+        .custom-input-container {
+            background-color: #cccccc;
+            border-radius: 50px;
+            padding: 12px 25px;
+            margin-bottom: 15px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        #chatBox::-webkit-scrollbar-thumb {
-            background-color: rgba(0,0,0,0.1);
-            border-radius: 10px;
+
+        .custom-label {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: #000;
+        }
+
+        .custom-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #555;
+            width: 100%;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .header-banner {
+            background-color: #cccccc;
+            border-radius: 50px;
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-text {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 28px;
+            text-transform: lowercase;
+        }
+
+        .btn-primary {
+            background-color: #0a0a45;
+            color: white;
+            border-radius: 50px;
+            padding: 15px;
+            width: 100%;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 24px;
+            margin-top: 20px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:active {
+            opacity: 0.8;
+        }
+
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background-color: #cccccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* Анимация переходов */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Чат */
+        .chat-header {
+            background: #0a0a45;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .messages-container {
+            padding-top: 70px;
+            padding-bottom: 80px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: #0a0a45;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: #eeeeee;
+            color: black;
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
         }
     </style>
 </head>
-<body class="bg-white h-screen flex items-center justify-center font-sans overflow-hidden">
+<body>
 
-    <!-- СТРАНИЦА 1: ВХОД -->
-    <div id="loginPage" class="w-full max-w-sm px-8 flex flex-col items-center gap-6">
+    <!-- Экран Входа -->
+    <div id="login-screen" class="screen active">
+        <div class="header-banner">
+            <h1 class="header-text">добрый день!</h1>
+        </div>
+
+        <div class="custom-input-container">
+            <label class="custom-label">юзернейм</label>
+            <input type="text" class="custom-input" id="login-username">
+        </div>
+
+        <div class="custom-input-container">
+            <label class="custom-label">пароль</label>
+            <input type="password" class="custom-input" id="login-password">
+        </div>
+
+        <button class="btn-primary" onclick="navigateTo('chat-screen')">Войти</button>
         
-        <!-- Поле IP -->
-        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
-            <input id="serverAddr" type="text" value="ws://192.168.0.243:8888/ws" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="ws://ip:port/ws">
-            <div class="input-line mt-1"></div>
-        </div>
-
-        <!-- Поле Имя -->
-        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
-            <input id="username" type="text" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="имя пользователя">
-            <div class="input-line mt-1"></div>
-        </div>
-
-        <!-- Поле Пароль -->
-        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
-            <input id="password" type="password" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="пароль">
-            <div class="input-line mt-1"></div>
-        </div>
-
-        <!-- Кнопка Connect -->
-        <button id="connectBtn" onclick="goToChat()" 
-                class="mt-4 w-48 bg-[#2E11B1] text-white py-3 rounded-full text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all">
-            connect
-        </button>
+        <p class="mt-6 text-sm font-bold cursor-pointer" onclick="navigateTo('register-screen')">
+            Нет аккаунта? Зарегистрироваться
+        </p>
     </div>
 
-    <!-- СТРАНИЦА 2: ЧАТ -->
-    <div id="chatPage" class="w-full max-w-md h-screen p-6 flex flex-col hidden">
-        
-        <!-- Заголовок с кнопкой назад -->
-        <div class="flex items-center mb-4 px-2">
-            <button onclick="goToLogin()" class="text-gray-500 hover:text-black transition flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                назад
-            </button>
-            <h2 id="chatTitle" class="ml-4 font-bold text-gray-800">Чат: ожидание...</h2>
+    <!-- Экран Регистрации -->
+    <div id="register-screen" class="screen">
+        <div class="header-banner">
+            <h1 class="header-text">добрый день!</h1>
         </div>
 
-        <!-- Область сообщений -->
-        <div id="chatBox" class="flex-grow custom-gray rounded-chat p-6 overflow-y-auto flex flex-col gap-3 shadow-inner">
-            <div id="placeholderText" class="text-gray-500 text-center mt-20 italic">область с сообщениями</div>
-        </div>
-
-        <!-- Поле ввода и Кнопка отправить -->
-        <div class="mt-6 flex gap-3 items-end">
-            <div class="flex-grow custom-gray rounded-login p-4 flex flex-col items-center">
-                <input id="messageInput" type="text" 
-                       class="bg-transparent w-full outline-none text-gray-700" placeholder="сообщение">
-                <div class="input-line mt-1 w-full"></div>
+        <div class="flex w-full gap-4 mb-4 items-center">
+            <div class="avatar-circle" onclick="document.getElementById('fileInput').click()">
+                аватарка
+                <input type="file" id="fileInput" hidden onchange="handleAvatar(this)">
+                <img id="avatarPreview" class="hidden w-full h-full object-cover">
             </div>
+            <div class="flex-1">
+                <div class="custom-input-container !mb-2">
+                    <label class="custom-label">имя/фамилия</label>
+                    <input type="text" class="custom-input">
+                </div>
+                <div class="custom-input-container !mb-0">
+                    <label class="custom-label">юзернейм</label>
+                    <input type="text" class="custom-input">
+                </div>
+            </div>
+        </div>
 
-            <button onclick="sendMessage()" 
-                    class="bg-[#00FF00] w-20 h-20 rounded-2xl font-black text-[10px] flex items-center justify-center text-center leading-tight hover:brightness-105 active:scale-90 shadow-md transition-all">
-                ОТПРАВИ<br>ТЬ
+        <div class="flex w-full gap-4">
+            <div class="custom-input-container">
+                <label class="custom-label">пароль</label>
+                <input type="password" class="custom-input">
+            </div>
+            <div class="custom-input-container">
+                <label class="custom-label">повтор пароля</label>
+                <input type="password" class="custom-input">
+            </div>
+        </div>
+
+        <button class="btn-primary !text-[20px]" onclick="navigateTo('login-screen')">зарегистрироваться</button>
+        
+        <p class="mt-6 text-sm font-bold cursor-pointer" onclick="navigateTo('login-screen')">
+            Уже есть аккаунт? Войти
+        </p>
+    </div>
+
+    <!-- Экран Чата -->
+    <div id="chat-screen" class="screen !p-0">
+        <div class="chat-header">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
+                </div>
+                <span class="font-bold">Общий чат</span>
+            </div>
+            <button onclick="navigateTo('login-screen')" class="text-sm">Выйти</button>
+        </div>
+
+        <div class="messages-container px-4" id="messages">
+            <div class="message received">Привет! Как дела?</div>
+            <div class="message sent">Привет! Дизайн готов.</div>
+            <div class="message received">Круто выглядит, прямо как на макетах!</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Сообщение..." class="flex-1 border rounded-full px-4 py-2 outline-none">
+            <button onclick="sendMessage()" class="bg-[#0a0a45] text-white rounded-full p-2 w-10 h-10 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
         </div>
     </div>
 
     <script>
-        let socket;
-        let currentUser = "";
-
-        function goToChat() {
-            const user = document.getElementById('username').value.trim();
-            const addr = document.getElementById('serverAddr').value.trim();
-
-            if (!user) {
-                showError("Введите имя пользователя!");
-                return;
-            }
-
-            currentUser = user;
+        function navigateTo(screenId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Показать нужный
+            document.getElementById(screenId).classList.add('active');
             
-            // Пытаемся подключиться
-            try {
-                connect(addr);
-            } catch (e) {
-                showError("Ошибка адреса!");
+            // Если перешли в чат, прокрутим вниз
+            if(screenId === 'chat-screen') {
+                setTimeout(scrollToBottom, 50);
             }
         }
 
-        function goToLogin() {
-            if (socket) socket.close();
-            document.getElementById('chatPage').classList.add('hidden');
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('chatBox').innerHTML = '<div id="placeholderText" class="text-gray-500 text-center mt-20 italic">область с сообщениями</div>';
-        }
-
-        function connect(addr) {
-            socket = new WebSocket(addr);
-
-            socket.onopen = () => {
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('chatPage').classList.remove('hidden');
-                document.getElementById('chatTitle').innerText = "Чат: " + addr.replace('ws://', '');
-                addSystemMessage("Подключено к серверу");
-            };
-
-            socket.onmessage = (event) => {
-                addMessage(event.data);
-            };
-
-            socket.onclose = (event) => {
-                addSystemMessage("Соединение разорвано");
-                setTimeout(goToLogin, 2000);
-            };
-
-            socket.onerror = (error) => {
-                showError("Ошибка подключения! Проверьте сервер.");
-            };
+        function handleAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatarPreview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    input.parentElement.childNodes[0].textContent = ''; 
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function sendMessage() {
             const input = document.getElementById('messageInput');
-            const msg = input.value.trim();
-            
-            if (socket && socket.readyState === WebSocket.OPEN && msg) {
-                socket.send(`${currentUser}: ${msg}`);
-                input.value = "";
+            const text = input.value.trim();
+            if (text) {
+                const container = document.getElementById('messages');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message sent';
+                msgDiv.textContent = text;
+                container.appendChild(msgDiv);
+                input.value = '';
+                scrollToBottom();
+
+                // Имитация ответа через секунду
+                setTimeout(() => {
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'message received';
+                    replyDiv.textContent = "Это тестовое сообщение (сервер не подключен)";
+                    container.appendChild(replyDiv);
+                    scrollToBottom();
+                }, 1000);
             }
         }
 
-        function addMessage(text) {
-            const chatBox = document.getElementById('chatBox');
-            const placeholder = document.getElementById('placeholderText');
-            if (placeholder) placeholder.remove();
-
-            const msgDiv = document.createElement('div');
-            // Если сообщение от текущего пользователя, можно стилизовать иначе
-            const isMe = text.startsWith(currentUser + ":");
-            
-            msgDiv.className = `p-3 rounded-2xl self-start max-w-[85%] text-sm shadow-sm ${isMe ? 'bg-indigo-100' : 'bg-white/80'}`;
-            msgDiv.innerText = text;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        function scrollToBottom() {
+            const container = document.getElementById('messages');
+            window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function addSystemMessage(text) {
-            const chatBox = document.getElementById('chatBox');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = "text-[10px] text-gray-500 text-center uppercase tracking-widest my-2";
-            msgDiv.innerText = "— " + text + " —";
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function showError(text) {
-            alert(text);
-        }
-
-        // Отправка по Enter
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+        // Поддержка Enter в инпуте сообщений
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
     </script>
 </body>
