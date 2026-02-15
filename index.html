@@ -16,7 +16,7 @@
             overflow-x: hidden;
         }
 
-        /* Стили из макетов */
+        /* Общие стили из макетов */
         .custom-input-container {
             background-color: #cccccc;
             border-radius: 50px;
@@ -75,28 +75,70 @@
             transition: opacity 0.2s;
         }
 
-        .btn-primary:active {
-            opacity: 0.8;
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .avatar-circle {
-            width: 100px;
-            height: 100px;
+        /* Стили экрана "Чаты" */
+        .chats-container {
             background-color: #cccccc;
-            border-radius: 50%;
+            border-radius: 30px;
+            width: 100%;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
+        .chat-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-style: italic;
-            font-size: 12px;
-            text-align: center;
-            padding: 10px;
+            padding: 12px 10px;
+            border-bottom: 1.5px solid #888;
             cursor: pointer;
-            overflow: hidden;
         }
 
-        /* Анимация переходов */
+        .chat-item:last-child {
+            border-bottom: none;
+        }
+
+        .chat-avatar-blue {
+            width: 45px;
+            height: 45px;
+            background-color: #0a0a45;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .search-area {
+            margin-top: auto;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-text {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 22px;
+            border-bottom: 2px solid #555;
+            flex-grow: 1;
+            background: transparent;
+            outline: none;
+        }
+
+        .search-icon-circle {
+            width: 45px;
+            height: 45px;
+            background-color: #0a0a45;
+            border-radius: 50%;
+        }
+
+        /* Навигация экранов */
         .screen {
             display: none;
             min-height: 100vh;
@@ -106,6 +148,9 @@
         .screen.active {
             display: flex;
             flex-direction: column;
+        }
+
+        .center-items {
             align-items: center;
         }
 
@@ -120,23 +165,14 @@
             z-index: 10;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .messages-container {
-            padding-top: 70px;
-            padding-bottom: 80px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
         .message {
             max-width: 80%;
             padding: 10px 15px;
             border-radius: 20px;
-            font-size: 14px;
+            margin-bottom: 8px;
         }
 
         .message.sent {
@@ -149,175 +185,217 @@
         .message.received {
             align-self: flex-start;
             background-color: #eeeeee;
-            color: black;
             border-bottom-left-radius: 2px;
         }
 
-        .input-area {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: white;
-            padding: 15px;
-            border-top: 1px solid #ddd;
+        .error-msg {
+            color: #ff0000;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .avatar-preview-circle {
+            width: 90px;
+            height: 90px;
+            background-color: #ccc;
+            border-radius: 50%;
+            overflow: hidden;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-cover: cover;
+            display: none;
         }
     </style>
 </head>
 <body>
 
     <!-- Экран Входа -->
-    <div id="login-screen" class="screen active">
+    <div id="login-screen" class="screen active center-items">
         <div class="header-banner">
             <h1 class="header-text">добрый день!</h1>
         </div>
-
         <div class="custom-input-container">
             <label class="custom-label">юзернейм</label>
-            <input type="text" class="custom-input" id="login-username">
+            <input type="text" id="login-user" class="custom-input">
         </div>
-
         <div class="custom-input-container">
             <label class="custom-label">пароль</label>
-            <input type="password" class="custom-input" id="login-password">
+            <input type="password" id="login-pass" class="custom-input">
         </div>
-
-        <button class="btn-primary" onclick="navigateTo('chat-screen')">Войти</button>
-        
-        <p class="mt-6 text-sm font-bold cursor-pointer" onclick="navigateTo('register-screen')">
-            Нет аккаунта? Зарегистрироваться
-        </p>
+        <div id="login-error" class="error-msg">Заполните все поля!</div>
+        <button class="btn-primary" onclick="tryLogin()">Войти</button>
+        <p class="mt-6 text-sm font-bold cursor-pointer" onclick="navigateTo('register-screen')">Зарегистрироваться</p>
     </div>
 
     <!-- Экран Регистрации -->
-    <div id="register-screen" class="screen">
+    <div id="register-screen" class="screen center-items">
         <div class="header-banner">
             <h1 class="header-text">добрый день!</h1>
         </div>
-
         <div class="flex w-full gap-4 mb-4 items-center">
-            <div class="avatar-circle" onclick="document.getElementById('fileInput').click()">
-                аватарка
-                <input type="file" id="fileInput" hidden onchange="handleAvatar(this)">
-                <img id="avatarPreview" class="hidden w-full h-full object-cover">
+            <div class="avatar-preview-circle" onclick="document.getElementById('avatar-input').click()">
+                <span id="avatar-placeholder" class="text-[10px] font-black italic text-center p-2">аватарка</span>
+                <img id="reg-avatar-img" class="avatar-img">
+                <input type="file" id="avatar-input" hidden accept="image/*" onchange="previewAvatar(this)">
             </div>
             <div class="flex-1">
                 <div class="custom-input-container !mb-2">
                     <label class="custom-label">имя/фамилия</label>
-                    <input type="text" class="custom-input">
+                    <input type="text" id="reg-name" class="custom-input">
                 </div>
                 <div class="custom-input-container !mb-0">
                     <label class="custom-label">юзернейм</label>
-                    <input type="text" class="custom-input">
+                    <input type="text" id="reg-user" class="custom-input">
                 </div>
             </div>
         </div>
-
         <div class="flex w-full gap-4">
-            <div class="custom-input-container">
-                <label class="custom-label">пароль</label>
-                <input type="password" class="custom-input">
-            </div>
-            <div class="custom-input-container">
-                <label class="custom-label">повтор пароля</label>
-                <input type="password" class="custom-input">
-            </div>
+            <div class="custom-input-container"><label class="custom-label">пароль</label><input type="password" id="reg-pass" class="custom-input"></div>
+            <div class="custom-input-container"><label class="custom-label">повтор</label><input type="password" id="reg-confirm" class="custom-input"></div>
         </div>
-
-        <button class="btn-primary !text-[20px]" onclick="navigateTo('login-screen')">зарегистрироваться</button>
-        
-        <p class="mt-6 text-sm font-bold cursor-pointer" onclick="navigateTo('login-screen')">
-            Уже есть аккаунт? Войти
-        </p>
+        <div id="reg-error" class="error-msg">Все поля должны быть заполнены!</div>
+        <button class="btn-primary" onclick="tryRegister()">зарегистрироваться</button>
     </div>
 
-    <!-- Экран Чата -->
-    <div id="chat-screen" class="screen !p-0">
-        <div class="chat-header">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
-                </div>
-                <span class="font-bold">Общий чат</span>
+    <!-- Экран Списка Чатов -->
+    <div id="chats-screen" class="screen">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-black italic">Чаты</h2>
+            <!-- Аватарка в кружке вверху -->
+            <div id="top-avatar-circle" class="w-10 h-10 bg-[#ccc] rounded-full overflow-hidden flex items-center justify-center">
+                <img id="top-avatar-img" class="w-full h-full object-cover hidden">
             </div>
-            <button onclick="navigateTo('login-screen')" class="text-sm">Выйти</button>
         </div>
 
-        <div class="messages-container px-4" id="messages">
-            <div class="message received">Привет! Как дела?</div>
-            <div class="message sent">Привет! Дизайн готов.</div>
-            <div class="message received">Круто выглядит, прямо как на макетах!</div>
+        <div class="chats-container">
+            <div class="chat-item" onclick="openChat('Алексей')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Алексей</span></div>
+            <div class="chat-item" onclick="openChat('Мария')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Мария</span></div>
+            <div class="chat-item" onclick="openChat('Дизайн Группа')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Дизайн Группа</span></div>
+            <div class="chat-item" onclick="openChat('Разработка')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Разработка</span></div>
+            <div class="chat-item" onclick="openChat('Мама')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Мама</span></div>
+            <div class="chat-item" onclick="openChat('Иван')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Иван</span></div>
+            <div class="chat-item" onclick="openChat('Поддержка')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Поддержка</span></div>
+            <div class="chat-item" onclick="openChat('Заметки')"><div class="chat-avatar-blue"></div><span class="font-bold italic">Заметки</span></div>
+
+            <div class="search-area">
+                <input type="text" class="search-text" placeholder="поиск">
+                <div class="search-icon-circle"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран Сообщений -->
+    <div id="messages-screen" class="screen !p-0">
+        <div class="chat-header">
+            <button onclick="navigateTo('chats-screen')" class="text-2xl">←</button>
+            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+            <span class="font-bold italic" id="chat-title">Чат</span>
         </div>
 
-        <div class="input-area">
-            <input type="text" id="messageInput" placeholder="Сообщение..." class="flex-1 border rounded-full px-4 py-2 outline-none">
-            <button onclick="sendMessage()" class="bg-[#0a0a45] text-white rounded-full p-2 w-10 h-10 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-            </button>
+        <div class="flex flex-col p-4 pt-20 pb-20" id="messages-list">
+            <div class="message received">Привет! Это сообщение из списка чатов.</div>
+            <div class="message sent">Дизайн полностью соответствует макету.</div>
+        </div>
+
+        <div class="fixed bottom-0 w-full bg-white p-4 border-t flex gap-2">
+            <input type="text" id="msgInput" placeholder="Сообщение..." class="flex-1 bg-gray-100 rounded-full px-4 outline-none">
+            <button onclick="sendMsg()" class="bg-[#0a0a45] text-white rounded-full w-10 h-10 flex items-center justify-center">></button>
         </div>
     </div>
 
     <script>
-        function navigateTo(screenId) {
-            // Скрыть все экраны
+        let currentUserAvatar = null;
+
+        function navigateTo(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Показать нужный
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             
-            // Если перешли в чат, прокрутим вниз
-            if(screenId === 'chat-screen') {
-                setTimeout(scrollToBottom, 50);
+            // Если переходим на экран чатов, ставим аватарку
+            if (id === 'chats-screen' && currentUserAvatar) {
+                const img = document.getElementById('top-avatar-img');
+                img.src = currentUserAvatar;
+                img.classList.remove('hidden');
             }
+            window.scrollTo(0,0);
         }
 
-        function handleAvatar(input) {
+        // Превью аватарки при регистрации
+        function previewAvatar(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('avatarPreview');
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                    input.parentElement.childNodes[0].textContent = ''; 
+                    currentUserAvatar = e.target.result;
+                    document.getElementById('reg-avatar-img').src = e.target.result;
+                    document.getElementById('reg-avatar-img').style.display = 'block';
+                    document.getElementById('avatar-placeholder').style.display = 'none';
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            if (text) {
-                const container = document.getElementById('messages');
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message sent';
-                msgDiv.textContent = text;
-                container.appendChild(msgDiv);
-                input.value = '';
-                scrollToBottom();
+        function tryLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const error = document.getElementById('login-error');
 
-                // Имитация ответа через секунду
-                setTimeout(() => {
-                    const replyDiv = document.createElement('div');
-                    replyDiv.className = 'message received';
-                    replyDiv.textContent = "Это тестовое сообщение (сервер не подключен)";
-                    container.appendChild(replyDiv);
-                    scrollToBottom();
-                }, 1000);
+            if (user === '' || pass === '') {
+                error.style.display = 'block';
+                return;
             }
+            error.style.display = 'none';
+            navigateTo('chats-screen');
         }
 
-        function scrollToBottom() {
-            const container = document.getElementById('messages');
+        function tryRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const user = document.getElementById('reg-user').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const confirm = document.getElementById('reg-confirm').value.trim();
+            const error = document.getElementById('reg-error');
+
+            if (name === '' || user === '' || pass === '' || confirm === '') {
+                error.textContent = "Все поля должны быть заполнены!";
+                error.style.display = 'block';
+                return;
+            }
+
+            if (pass !== confirm) {
+                error.textContent = "Пароли не совпадают!";
+                error.style.display = 'block';
+                return;
+            }
+
+            error.style.display = 'none';
+            navigateTo('login-screen');
+        }
+
+        function openChat(name) {
+            document.getElementById('chat-title').innerText = name;
+            navigateTo('messages-screen');
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('msgInput');
+            if(!input.value) return;
+            const list = document.getElementById('messages-list');
+            const div = document.createElement('div');
+            div.className = 'message sent';
+            div.innerText = input.value;
+            list.appendChild(div);
+            input.value = '';
             window.scrollTo(0, document.body.scrollHeight);
         }
-
-        // Поддержка Enter в инпуте сообщений
-        document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
     </script>
 </body>
 </html>
