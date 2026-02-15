@@ -3,296 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Елицы - Православная социальная сеть</title>
+    <title>Messenger Web</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --brand-green: #76b82a;
-            --brand-hover: #659f24;
+        .custom-gray { background-color: #D1D5DB; }
+        .input-line {
+            border-bottom: 1.5px solid #4b5563;
+            width: 80%;
+            margin: 0 auto;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
-                        url('https://images.unsplash.com/photo-1548705085-101177834f47?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        .page-container {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-            min-height: 100vh;
-            width: 100%;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .page-active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .brand-green { color: var(--brand-green); }
-        .bg-brand-green { background-color: var(--brand-green); }
-
-        /* Auth Card Styles */
-        .auth-card {
-            background-color: var(--brand-green);
-            border-radius: 20px;
-            color: white;
-            box-shadow: 0 8px 30px rgba(118, 184, 42, 0.3);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .input-field {
-            background: white;
-            border-radius: 25px;
-            border: none;
-            padding: 12px 20px;
-            color: #333;
-            width: 100%;
-            outline: none;
-        }
-
-        .btn-outline {
-            border: 2px solid white;
-            border-radius: 25px;
-            padding: 12px;
-            width: 100%;
-            transition: all 0.3s;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-outline:hover {
-            background: white;
-            color: var(--brand-green);
-        }
-
-        /* Messenger Glass Styles */
-        .messenger-layout {
-            width: 95vw;
-            max-width: 1100px;
-            height: 85vh;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            display: flex;
-            overflow: hidden;
-        }
-
-        .contact-item.active {
-            background-color: #f0f9eb;
-            border-left: 4px solid var(--brand-green);
-        }
-
-        .message-bubble {
-            max-width: 75%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .message-in {
-            background-color: #f1f0f0;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message-out {
-            background-color: var(--brand-green);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .scroll-hide::-webkit-scrollbar { width: 4px; }
-        .scroll-hide::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+        .hidden { display: none; }
+        /* Стили для скругления как на макете */
+        .rounded-login { border-radius: 2.5rem; }
+        .rounded-chat { border-radius: 3rem; }
     </style>
 </head>
-<body>
+<body class="bg-white h-screen flex items-center justify-center font-sans">
 
-    <!-- Страница регистрации -->
-    <div id="registration-page" class="page-container page-active p-4">
-        <div class="flex flex-col items-center w-full">
-            <div class="text-center mb-8">
-                <h1 class="text-6xl font-bold brand-green mb-2" style="font-family: 'Georgia', serif;">Елицы</h1>
-                <p class="uppercase tracking-widest text-gray-600 text-sm font-semibold">Православная социальная сеть</p>
-            </div>
-
-            <div class="auth-card p-10">
-                <h2 class="text-2xl text-center font-light mb-8 uppercase tracking-widest">Регистрация</h2>
-                
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-semibold mb-2 ml-4 opacity-90 uppercase">Имя</label>
-                        <input type="text" class="input-field" placeholder="Ваше имя">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-2 ml-4 opacity-90 uppercase">Email</label>
-                        <input type="email" class="input-field" placeholder="Ваш E-mail">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-2 ml-4 opacity-90 uppercase">Пароль</label>
-                        <input type="password" class="input-field" placeholder="Придумайте пароль">
-                    </div>
-
-                    <div class="pt-4">
-                        <button onclick="navigateTo('messenger-page')" class="btn-outline">
-                            Создать аккаунт
-                        </button>
-                    </div>
-
-                    <div class="text-center mt-6">
-                        <a href="#" class="text-xs underline opacity-80 hover:opacity-100 transition-opacity">
-                            Уже есть профиль? Войти
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <!-- СТРАНИЦА 1: ВХОД -->
+    <div id="loginPage" class="w-full max-w-sm px-8 flex flex-col items-center gap-6">
+        
+        <!-- Поле IP -->
+        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
+            <input id="serverAddr" type="text" value="ws://localhost:8888/ws" 
+                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="ip:port">
+            <div class="input-line mt-1"></div>
         </div>
+
+        <!-- Поле Имя -->
+        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
+            <input id="username" type="text" 
+                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="имя пользователя">
+            <div class="input-line mt-1"></div>
+        </div>
+
+        <!-- Поле Пароль -->
+        <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
+            <input id="password" type="password" 
+                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="пароль">
+            <div class="input-line mt-1"></div>
+        </div>
+
+        <!-- Кнопка Connect -->
+        <button onclick="goToChat()" 
+                class="mt-4 w-48 bg-indigo-900 text-white py-3 rounded-full text-lg shadow-md hover:bg-indigo-800 active:scale-95 transition">
+            connect
+        </button>
     </div>
 
-    <!-- Страница мессенджера -->
-    <div id="messenger-page" class="page-container p-4">
-        <div class="messenger-layout flex-col md:flex-row">
-            
-            <!-- Боковая панель (Контакты) -->
-            <div class="w-full md:w-80 flex flex-col bg-white border-r border-gray-100">
-                <div class="p-6 flex items-center justify-between border-b border-gray-50">
-                    <h3 class="text-xl font-bold brand-green">Елицы.Диалоги</h3>
-                    <button onclick="navigateTo('registration-page')" class="text-gray-400 hover:text-red-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto scroll-hide">
-                    <div class="contact-item active p-4 flex items-center cursor-pointer transition-all">
-                        <div class="w-12 h-12 rounded-full mr-3 bg-gray-100 flex-shrink-0 border-2 border-green-100">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Nikolai" alt="avatar" class="rounded-full">
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="flex justify-between items-baseline">
-                                <h4 class="font-bold text-gray-800 truncate">Отец Николай</h4>
-                                <span class="text-[10px] text-gray-400 font-medium">12:45</span>
-                            </div>
-                            <p class="text-sm text-gray-500 truncate font-medium">Мир вашему дому!</p>
-                        </div>
-                    </div>
+    <!-- СТРАНИЦА 2: ЧАТ -->
+    <div id="chatPage" class="w-full max-w-md h-screen p-6 flex flex-col hidden">
+        
+        <!-- Заголовок с кнопкой назад -->
+        <div class="flex items-center mb-4">
+            <button onclick="goToLogin()" class="text-gray-500 mr-4">← назад</button>
+            <h2 id="chatTitle" class="font-bold text-lg">Чат</h2>
+        </div>
 
-                    <div class="contact-item p-4 flex items-center cursor-pointer hover:bg-gray-50 border-l-4 border-transparent transition-all">
-                        <div class="w-12 h-12 rounded-full mr-3 bg-gray-100 flex-shrink-0">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Anna" alt="avatar" class="rounded-full">
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="flex justify-between items-baseline">
-                                <h4 class="font-semibold text-gray-800 truncate">Анна (Приход)</h4>
-                                <span class="text-[10px] text-gray-400">Вчера</span>
-                            </div>
-                            <p class="text-sm text-gray-400 truncate">Помощь в храме...</p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Область сообщений -->
+        <div id="chatBox" class="flex-grow custom-gray rounded-chat p-6 overflow-y-auto flex flex-col gap-3 shadow-inner">
+            <div class="text-gray-500 text-center mt-20">область с сообщениями</div>
+        </div>
+
+        <!-- Поле ввода и Кнопка отправить -->
+        <div class="mt-6 flex gap-3 items-end">
+            <div class="flex-grow custom-gray rounded-login p-4 flex flex-col items-center">
+                <input id="messageInput" type="text" 
+                       class="bg-transparent w-full outline-none text-gray-700" placeholder="сообщение">
+                <div class="input-line mt-1 w-full"></div>
             </div>
 
-            <!-- Область чата -->
-            <div class="flex-1 flex flex-col bg-gray-50/50">
-                <!-- Заголовок чата -->
-                <div class="p-4 bg-white/80 border-b flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 rounded-full mr-3 border border-green-50">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Nikolai" alt="avatar" class="rounded-full">
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-800">Отец Николай</h4>
-                            <div class="flex items-center">
-                                <span class="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-                                <span class="text-[10px] text-green-600 font-bold uppercase tracking-wider">в сети</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Список сообщений -->
-                <div class="flex-1 p-6 overflow-y-auto flex flex-col scroll-hide">
-                    <div class="message-bubble message-in shadow-sm">
-                        Здравствуйте! Как продвигается подготовка к благотворительной ярмарке?
-                    </div>
-                    <div class="message-bubble message-out shadow-sm">
-                        Добрый день, батюшка! Почти всё готово, собираем поделки от детей.
-                    </div>
-                    <div class="text-center my-6">
-                        <span class="bg-white/80 text-gray-400 text-[10px] py-1 px-4 rounded-full uppercase tracking-widest font-bold shadow-sm">Сегодня</span>
-                    </div>
-                    <div class="message-bubble message-in shadow-sm">
-                        Мир вашему дому! Будем ждать вас в воскресенье. Помоги Господь в делах ваших.
-                    </div>
-                </div>
-
-                <!-- Ввод сообщения -->
-                <div class="p-6 bg-white border-t border-gray-100">
-                    <div class="flex items-center bg-gray-100 rounded-2xl px-4 py-3 border border-gray-200 focus-within:border-brand-green transition-colors">
-                        <button class="text-gray-400 hover:text-brand-green transition-colors mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                        </button>
-                        <input type="text" placeholder="Напишите сообщение..." class="bg-transparent flex-1 outline-none text-sm font-medium text-gray-700">
-                        <button class="bg-brand-green text-white p-2 ml-2 rounded-xl hover:bg-brand-green-hover shadow-md transition-all active:scale-95">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+            <button onclick="sendMessage()" 
+                    class="bg-green-400 w-20 h-20 rounded-2xl font-bold text-xs flex items-center justify-center text-center leading-tight hover:bg-green-500 active:scale-95 transition">
+                ОТПРАВИ<br>ТЬ
+            </button>
         </div>
     </div>
 
     <script>
-        /**
-         * Функция навигации между экранами
-         * @param {string} pageId - ID элемента страницы
-         */
-        function navigateTo(pageId) {
-            // Скрываем все страницы
-            document.querySelectorAll('.page-container').forEach(page => {
-                page.classList.remove('page-active');
-            });
+        let socket;
+        let currentUser = "";
 
-            // Показываем нужную страницу с задержкой для эффекта плавности
-            const targetPage = document.getElementById(pageId);
-            setTimeout(() => {
-                targetPage.classList.add('page-active');
-                
-                // Настройка выравнивания для мессенджера
-                if (pageId === 'messenger-page') {
-                    document.body.style.alignItems = 'center';
-                } else {
-                    document.body.style.alignItems = 'center';
-                }
-            }, 50);
+        function goToChat() {
+            const user = document.getElementById('username').value.trim();
+            const addr = document.getElementById('serverAddr').value.trim();
+
+            if (!user) {
+                alert("Введите имя пользователя!");
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('chatPage').classList.remove('hidden');
+            document.getElementById('chatTitle').innerText = "Чат: " + addr;
+
+            connect(addr);
         }
 
-        // Инициализация при загрузке
-        window.onload = () => {
-            console.log("Приложение загружено. Режим: Регистрация");
-        };
+        function goToLogin() {
+            if (socket) socket.close();
+            document.getElementById('chatPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        function connect(addr) {
+            socket = new WebSocket(addr);
+
+            socket.onopen = () => {
+                addMessage("[Система]: Подключено к серверу");
+            };
+
+            socket.onmessage = (event) => {
+                addMessage(event.data);
+            };
+
+            socket.onclose = () => {
+                addMessage("[Система]: Соединение разорвано");
+            };
+
+            socket.onerror = () => {
+                addMessage("[Ошибка]: Не удалось соединиться");
+            };
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const msg = input.value.trim();
+            
+            if (socket && socket.readyState === WebSocket.OPEN && msg) {
+                socket.send(`${currentUser}: ${msg}`);
+                input.value = "";
+            }
+        }
+
+        function addMessage(text) {
+            const chatBox = document.getElementById('chatBox');
+            
+            // Убираем текст-заглушку при первом сообщении
+            if (chatBox.innerText.includes("область с сообщениями")) {
+                chatBox.innerHTML = "";
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "bg-white/60 p-3 rounded-2xl self-start max-w-[85%] text-sm shadow-sm";
+            msgDiv.innerText = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Отправка по Enter
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>
