@@ -13,40 +13,48 @@
             margin: 0 auto;
         }
         .hidden { display: none; }
-        /* Стили для скругления как на макете */
         .rounded-login { border-radius: 2.5rem; }
         .rounded-chat { border-radius: 3rem; }
+        
+        /* Стили для скроллбара */
+        #chatBox::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chatBox::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="bg-white h-screen flex items-center justify-center font-sans">
+<body class="bg-white h-screen flex items-center justify-center font-sans overflow-hidden">
 
     <!-- СТРАНИЦА 1: ВХОД -->
     <div id="loginPage" class="w-full max-w-sm px-8 flex flex-col items-center gap-6">
         
         <!-- Поле IP -->
         <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
-            <input id="serverAddr" type="text" value="ws://localhost:8888/ws" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="ip:port">
+            <input id="serverAddr" type="text" value="ws://192.168.0.243:8888/ws" 
+                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="ws://ip:port/ws">
             <div class="input-line mt-1"></div>
         </div>
 
         <!-- Поле Имя -->
         <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
             <input id="username" type="text" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="имя пользователя">
+                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="имя пользователя">
             <div class="input-line mt-1"></div>
         </div>
 
         <!-- Поле Пароль -->
         <div class="w-full custom-gray rounded-login p-4 flex flex-col items-center">
             <input id="password" type="password" 
-                   class="bg-transparent w-full text-center outline-none text-gray-700" placeholder="пароль">
+                   class="bg-transparent w-full text-center outline-none text-gray-700 font-medium" placeholder="пароль">
             <div class="input-line mt-1"></div>
         </div>
 
         <!-- Кнопка Connect -->
-        <button onclick="goToChat()" 
-                class="mt-4 w-48 bg-indigo-900 text-white py-3 rounded-full text-lg shadow-md hover:bg-indigo-800 active:scale-95 transition">
+        <button id="connectBtn" onclick="goToChat()" 
+                class="mt-4 w-48 bg-[#2E11B1] text-white py-3 rounded-full text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all">
             connect
         </button>
     </div>
@@ -55,14 +63,17 @@
     <div id="chatPage" class="w-full max-w-md h-screen p-6 flex flex-col hidden">
         
         <!-- Заголовок с кнопкой назад -->
-        <div class="flex items-center mb-4">
-            <button onclick="goToLogin()" class="text-gray-500 mr-4">← назад</button>
-            <h2 id="chatTitle" class="font-bold text-lg">Чат</h2>
+        <div class="flex items-center mb-4 px-2">
+            <button onclick="goToLogin()" class="text-gray-500 hover:text-black transition flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                назад
+            </button>
+            <h2 id="chatTitle" class="ml-4 font-bold text-gray-800">Чат: ожидание...</h2>
         </div>
 
         <!-- Область сообщений -->
         <div id="chatBox" class="flex-grow custom-gray rounded-chat p-6 overflow-y-auto flex flex-col gap-3 shadow-inner">
-            <div class="text-gray-500 text-center mt-20">область с сообщениями</div>
+            <div id="placeholderText" class="text-gray-500 text-center mt-20 italic">область с сообщениями</div>
         </div>
 
         <!-- Поле ввода и Кнопка отправить -->
@@ -74,7 +85,7 @@
             </div>
 
             <button onclick="sendMessage()" 
-                    class="bg-green-400 w-20 h-20 rounded-2xl font-bold text-xs flex items-center justify-center text-center leading-tight hover:bg-green-500 active:scale-95 transition">
+                    class="bg-[#00FF00] w-20 h-20 rounded-2xl font-black text-[10px] flex items-center justify-center text-center leading-tight hover:brightness-105 active:scale-90 shadow-md transition-all">
                 ОТПРАВИ<br>ТЬ
             </button>
         </div>
@@ -89,41 +100,48 @@
             const addr = document.getElementById('serverAddr').value.trim();
 
             if (!user) {
-                alert("Введите имя пользователя!");
+                showError("Введите имя пользователя!");
                 return;
             }
 
             currentUser = user;
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('chatPage').classList.remove('hidden');
-            document.getElementById('chatTitle').innerText = "Чат: " + addr;
-
-            connect(addr);
+            
+            // Пытаемся подключиться
+            try {
+                connect(addr);
+            } catch (e) {
+                showError("Ошибка адреса!");
+            }
         }
 
         function goToLogin() {
             if (socket) socket.close();
             document.getElementById('chatPage').classList.add('hidden');
             document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('chatBox').innerHTML = '<div id="placeholderText" class="text-gray-500 text-center mt-20 italic">область с сообщениями</div>';
         }
 
         function connect(addr) {
             socket = new WebSocket(addr);
 
             socket.onopen = () => {
-                addMessage("[Система]: Подключено к серверу");
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('chatPage').classList.remove('hidden');
+                document.getElementById('chatTitle').innerText = "Чат: " + addr.replace('ws://', '');
+                addSystemMessage("Подключено к серверу");
             };
 
             socket.onmessage = (event) => {
                 addMessage(event.data);
             };
 
-            socket.onclose = () => {
-                addMessage("[Система]: Соединение разорвано");
+            socket.onclose = (event) => {
+                addSystemMessage("Соединение разорвано");
+                setTimeout(goToLogin, 2000);
             };
 
-            socket.onerror = () => {
-                addMessage("[Ошибка]: Не удалось соединиться");
+            socket.onerror = (error) => {
+                showError("Ошибка подключения! Проверьте сервер.");
             };
         }
 
@@ -139,17 +157,30 @@
 
         function addMessage(text) {
             const chatBox = document.getElementById('chatBox');
-            
-            // Убираем текст-заглушку при первом сообщении
-            if (chatBox.innerText.includes("область с сообщениями")) {
-                chatBox.innerHTML = "";
-            }
+            const placeholder = document.getElementById('placeholderText');
+            if (placeholder) placeholder.remove();
 
             const msgDiv = document.createElement('div');
-            msgDiv.className = "bg-white/60 p-3 rounded-2xl self-start max-w-[85%] text-sm shadow-sm";
+            // Если сообщение от текущего пользователя, можно стилизовать иначе
+            const isMe = text.startsWith(currentUser + ":");
+            
+            msgDiv.className = `p-3 rounded-2xl self-start max-w-[85%] text-sm shadow-sm ${isMe ? 'bg-indigo-100' : 'bg-white/80'}`;
             msgDiv.innerText = text;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const chatBox = document.getElementById('chatBox');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "text-[10px] text-gray-500 text-center uppercase tracking-widest my-2";
+            msgDiv.innerText = "— " + text + " —";
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showError(text) {
+            alert(text);
         }
 
         // Отправка по Enter
